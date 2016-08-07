@@ -21,7 +21,10 @@ class AppKernel extends Kernel
     {
         return [
             // your app bundles should be registered here
-            new Acme\Bundle\AppBundle\AcmeAppBundle(),
+            //new Acme\Bundle\AppBundle\AcmeAppBundle(),
+            new Acme\Bundle\CustomBundle\AcmeCustomBundle(),
+            new Pim\Bundle\EnhancedConnectorBundle\PimEnhancedConnectorBundle(),
+            new Pim\Bundle\CustomEntityBundle\PimCustomEntityBundle(),
         ];
     }
 

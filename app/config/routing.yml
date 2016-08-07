@@ -38,6 +38,10 @@ pim_localization:
 pim_reference_data:
     resource: "@PimReferenceDataBundle/Resources/config/routing.yml"
 
+pim_customentity:
+    prefix: /reference-data
+    resource: "@PimCustomEntityBundle/Resources/config/routing.yml"
+
 # Oro platform
 
 oro_default:
