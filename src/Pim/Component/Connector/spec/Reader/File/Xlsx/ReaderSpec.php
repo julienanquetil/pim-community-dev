@@ -8,7 +8,7 @@ use PhpSpec\ObjectBehavior;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
 use Pim\Component\Connector\Exception\DataArrayConversionException;
 use Pim\Component\Connector\Reader\File\FileIteratorFactory;
-use Pim\Component\Connector\Reader\File\FileIteratorInterface;
+use Pim\Component\Connector\Reader\File\FileIterator;
 use Prophecy\Argument;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -27,7 +27,7 @@ class ReaderSpec extends ObjectBehavior
         $fileIteratorFactory,
         $converter,
         $stepExecution,
-        FileIteratorInterface $fileIterator,
+        FileIterator $fileIterator,
         JobParameters $jobParameters
     ) {
         $filePath = __DIR__ . DIRECTORY_SEPARATOR .
@@ -49,6 +49,7 @@ class ReaderSpec extends ObjectBehavior
         $fileIterator->getHeaders()->willReturn(['sku', 'name']);
         $fileIterator->rewind()->shouldBeCalled();
         $fileIterator->next()->shouldBeCalled();
+        $fileIterator->isHeader()->willReturn(false);
         $fileIterator->valid()->willReturn(true);
         $fileIterator->current()->willReturn($data);
         $converter->convert($data, Argument::any())->willReturn($data);
@@ -62,7 +63,7 @@ class ReaderSpec extends ObjectBehavior
         $fileIteratorFactory,
         $converter,
         $stepExecution,
-        FileIteratorInterface $fileIterator,
+        FileIterator $fileIterator,
         JobParameters $jobParameters
     ) {
         $filePath = __DIR__ . DIRECTORY_SEPARATOR .
@@ -86,6 +87,7 @@ class ReaderSpec extends ObjectBehavior
         $fileIterator->getHeaders()->willReturn(['sku', 'name']);
         $fileIterator->rewind()->shouldBeCalled();
         $fileIterator->next()->shouldBeCalled();
+        $fileIterator->isHeader()->willReturn(false);
         $fileIterator->valid()->willReturn(true);
         $fileIterator->current()->willReturn($data);
         $converter->convert($data, Argument::any())->willReturn($data);

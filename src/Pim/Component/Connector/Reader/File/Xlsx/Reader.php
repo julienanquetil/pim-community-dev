@@ -69,7 +69,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
 
         $this->fileIterator->next();
 
-        if ($this->fileIterator->valid() && null !== $this->stepExecution) {
+        if (!$this->fileIterator->isHeader() && $this->fileIterator->valid() && null !== $this->stepExecution) {
             $this->stepExecution->incrementSummaryInfo('item_position');
         }
 

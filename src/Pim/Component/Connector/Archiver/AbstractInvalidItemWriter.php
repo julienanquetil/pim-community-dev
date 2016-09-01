@@ -86,20 +86,27 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
         }
 
         $readJobParameters = $jobExecution->getJobParameters();
-        $currentLineNumber = 0;
+        $currentItemPosition = 0;
         $itemsToWrite = [];
 
         $fileIterator = $this->getInputFileIterator($readJobParameters);
-        $headers = $fileIterator->getHeaders();
 
         $this->setupWriter($jobExecution);
 
         foreach ($fileIterator as $readItem) {
-            $currentLineNumber++;
+            if (!$fileIterator->isHeader()) {
+                $currentItemPosition++;
+            }
 
-            if ($invalidItemPositions->contains($currentLineNumber)) {
-                $itemsToWrite[] = array_combine($headers, $readItem);
-                $invalidItemPositions->removeElement($currentLineNumber);
+            if ($invalidItemPositions->contains($currentItemPosition)) {
+                // Headers value might change depending on the current node
+                // like in Json and XML
+                $headers = $fileIterator->getHeaders();
+                $invalidItem = array_combine($headers, $readItem);
+                if (false !== $invalidItem) {
+                    $itemsToWrite[] = $invalidItem;
+                }
+                $invalidItemPositions->removeElement($currentItemPosition);
             }
 
             if (count($itemsToWrite) > 0 && 0 === count($itemsToWrite) % $this->batchSize) {

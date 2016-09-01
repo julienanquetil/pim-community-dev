@@ -130,6 +130,14 @@ Est'
         $this->valid()->shouldReturn(false);
     }
 
+    function it_indicates_if_current_position_is_header()
+    {
+        $this->rewind();
+        $this->isHeader()->shouldReturn(true);
+        $this->next();
+        $this->isHeader()->shouldReturn(false);
+    }
+
     private function getPath()
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' .

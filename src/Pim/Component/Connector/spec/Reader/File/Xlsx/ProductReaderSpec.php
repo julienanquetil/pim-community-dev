@@ -7,7 +7,7 @@ use Akeneo\Component\Batch\Model\StepExecution;
 use PhpSpec\ObjectBehavior;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
 use Pim\Component\Connector\Reader\File\FileIteratorFactory;
-use Pim\Component\Connector\Reader\File\FileIteratorInterface;
+use Pim\Component\Connector\Reader\File\FileIterator;
 use Pim\Component\Connector\Reader\File\MediaPathTransformer;
 use Prophecy\Argument;
 
@@ -38,7 +38,7 @@ class ProductReaderSpec extends ObjectBehavior
         $arrayConverter,
         $mediaPathTransformer,
         $stepExecution,
-        FileIteratorInterface $fileIterator,
+        FileIterator $fileIterator,
         JobParameters $jobParameters
     ) {
         $filePath = __DIR__ . '/../../../../../../../../features/Context/fixtures/with_media.csv';
@@ -96,6 +96,7 @@ class ProductReaderSpec extends ObjectBehavior
         $fileIterator->rewind()->shouldBeCalled();
         $fileIterator->next()->shouldBeCalled();
         $fileIterator->current()->willReturn($item);
+        $fileIterator->isHeader()->willReturn(false);
         $fileIterator->valid()->willReturn(true);
         $fileIterator->getDirectoryPath()->willReturn($filePath);
 

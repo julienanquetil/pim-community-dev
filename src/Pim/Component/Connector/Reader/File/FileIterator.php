@@ -166,6 +166,16 @@ class FileIterator implements FileIteratorInterface
     }
 
     /**
+     * Indicates whether the current row is the header
+     *
+     * @return boolean
+     */
+    public function isHeader()
+    {
+        return 1 === $this->rows->key();
+    }
+
+    /**
      * Extract the zip archive to be imported
      *
      * @throws \RuntimeException When archive cannot be opened or extracted or does not contain exactly one file file

@@ -7,7 +7,7 @@ use Akeneo\Component\Batch\Model\StepExecution;
 use PhpSpec\ObjectBehavior;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
 use Pim\Component\Connector\Reader\File\FileIteratorFactory;
-use Pim\Component\Connector\Reader\File\FileIteratorInterface;
+use Pim\Component\Connector\Reader\File\FileIterator;
 use Pim\Component\Connector\Reader\File\MediaPathTransformer;
 use Prophecy\Argument;
 
@@ -37,7 +37,7 @@ class  ProductReaderSpec extends ObjectBehavior
         $fileIteratorFactory,
         $converter,
         $stepExecution,
-        FileIteratorInterface $fileIterator,
+        FileIterator $fileIterator,
         JobParameters $jobParameters,
         $mediaPath
     ) {
@@ -70,6 +70,7 @@ class  ProductReaderSpec extends ObjectBehavior
         $fileIterator->rewind()->shouldBeCalled();
         $fileIterator->next()->shouldBeCalled();
         $fileIterator->current()->willReturn($data);
+        $fileIterator->isHeader()->willReturn(false);
         $fileIterator->valid()->willReturn(true);
 
         $absolutePath = [
