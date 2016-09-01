@@ -78,10 +78,10 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
             return;
         }
 
-        $invalidLineNumbers = new ArrayCollection();
+        $invalidItemPositions = new ArrayCollection();
         foreach ($this->collector->getInvalidItems() as $invalidItem) {
             if ($invalidItem instanceof InvalidItemInterface) {
-                $invalidLineNumbers->add($invalidItem->getLineNumber());
+                $invalidItemPositions->add($invalidItem->getItemPosition());
             }
         }
 
@@ -97,9 +97,9 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
         foreach ($fileIterator as $readItem) {
             $currentLineNumber++;
 
-            if ($invalidLineNumbers->contains($currentLineNumber)) {
+            if ($invalidItemPositions->contains($currentLineNumber)) {
                 $itemsToWrite[] = array_combine($headers, $readItem);
-                $invalidLineNumbers->removeElement($currentLineNumber);
+                $invalidItemPositions->removeElement($currentLineNumber);
             }
 
             if (count($itemsToWrite) > 0 && 0 === count($itemsToWrite) % $this->batchSize) {
@@ -107,7 +107,7 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
                 $itemsToWrite = [];
             }
 
-            if ($invalidLineNumbers->isEmpty()) {
+            if ($invalidItemPositions->isEmpty()) {
                 break;
             }
         }
