@@ -94,9 +94,7 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
         $this->setupWriter($jobExecution);
 
         foreach ($fileIterator as $readItem) {
-            if (!$fileIterator->isHeader()) {
-                $currentItemPosition++;
-            }
+            $currentItemPosition++;
 
             if ($invalidItemPositions->contains($currentItemPosition)) {
                 // Headers value might change depending on the current node

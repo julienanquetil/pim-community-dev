@@ -46,6 +46,7 @@ class CsvInvalidItemWriter extends AbstractInvalidItemWriter
             ]
         ]);
         $fileIterator->rewind();
+        $fileIterator->next();
 
         return $fileIterator;
     }
