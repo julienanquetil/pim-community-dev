@@ -18,7 +18,7 @@ parameters:
 
     pim_connector.reader.file.yaml.class: Pim\Component\Connector\Reader\File\Yaml\Reader
 
-    pim_connector.reader.file.flat_file_iterator_factory.: Pim\Component\Connector\Reader\File\FlatFileIterator
+    pim_connector.reader.file.flat_file_iterator.class: Pim\Component\Connector\Reader\File\FlatFileIterator
     pim_connector.reader.file.flat_file_iterator_factory.class: Pim\Component\Connector\Reader\File\FlatFileIteratorFactory
     pim_connector.reader.file.media_path_transformer.class: Pim\Component\Connector\Reader\File\MediaPathTransformer
     pim_connector.reader.file.array_reader.class: Pim\Component\Connector\Reader\File\ArrayReader
