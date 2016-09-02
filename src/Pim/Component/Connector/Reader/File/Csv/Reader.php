@@ -11,8 +11,8 @@ use Akeneo\Component\Batch\Step\StepExecutionAwareInterface;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
 use Pim\Component\Connector\Exception\DataArrayConversionException;
 use Pim\Component\Connector\Exception\InvalidItemFromViolationsException;
-use Pim\Component\Connector\Reader\File\FileIteratorFactory;
-use Pim\Component\Connector\Reader\File\FileIteratorInterface;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorFactory;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -24,14 +24,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Reader implements ItemReaderInterface, StepExecutionAwareInterface, FlushableInterface
 {
-    /** @var FileIteratorFactory */
-    protected $fileIteratorFactory;
+    /** @var FlatFileIteratorFactory */
+    protected $flatFileIteratorFactory;
 
     /** @var ArrayConverterInterface */
     protected $converter;
 
-    /** @var FileIteratorInterface */
-    protected $fileIterator;
+    /** @var FlatFileIteratorInterface */
+    protected $flatFileIterator;
 
     /** @var StepExecution */
     protected $stepExecution;
@@ -40,16 +40,16 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
     protected $options;
 
     /**
-     * @param FileIteratorFactory     $fileIteratorFactory
+     * @param FlatFileIteratorFactory $flatFileIteratorFactory
      * @param ArrayConverterInterface $converter
      * @param array                   $options
      */
     public function __construct(
-        FileIteratorFactory $fileIteratorFactory,
+        FlatFileIteratorFactory $flatFileIteratorFactory,
         ArrayConverterInterface $converter,
         array $options = []
     ) {
-        $this->fileIteratorFactory = $fileIteratorFactory;
+        $this->flatFileIteratorFactory = $flatFileIteratorFactory;
         $this->converter = $converter;
         $this->options = $options;
     }
@@ -60,7 +60,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
     public function read()
     {
         $filePath = null;
-        if (null === $this->fileIterator) {
+        if (null === $this->flatFileIterator) {
             $jobParameters = $this->stepExecution->getJobParameters();
             $filePath = $jobParameters->get('filePath');
             $delimiter = $jobParameters->get('delimiter');
@@ -71,26 +71,26 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
                     'fieldEnclosure' => $enclosure,
                 ],
             ];
-            $this->fileIterator = $this->fileIteratorFactory->create(
+            $this->flatFileIterator = $this->flatFileIteratorFactory->create(
                 $filePath,
                 array_merge($defaultOptions, $this->options)
             );
-            $this->fileIterator->rewind();
+            $this->flatFileIterator->rewind();
         }
 
-        $this->fileIterator->next();
+        $this->flatFileIterator->next();
 
-        if (!$this->fileIterator->isHeader() && $this->fileIterator->valid() && null !== $this->stepExecution) {
+        if ($this->flatFileIterator->valid() && null !== $this->stepExecution) {
             $this->stepExecution->incrementSummaryInfo('item_position');
         }
 
-        $data = $this->fileIterator->current();
+        $data = $this->flatFileIterator->current();
 
         if (null === $data) {
             return null;
         }
 
-        $headers = $this->fileIterator->getHeaders();
+        $headers = $this->flatFileIterator->getHeaders();
 
         $countHeaders = count($headers);
         $countData = count($data);
@@ -103,7 +103,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
             $data = array_merge($data, $missingValues);
         }
 
-        $item = array_combine($this->fileIterator->getHeaders(), $data);
+        $item = array_combine($this->flatFileIterator->getHeaders(), $data);
 
         try {
             $item = $this->converter->convert($item, $this->getArrayConverterOptions());
@@ -127,7 +127,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
      */
     public function flush()
     {
-        $this->fileIterator = null;
+        $this->flatFileIterator = null;
     }
 
     /**
@@ -189,7 +189,7 @@ class Reader implements ItemReaderInterface, StepExecutionAwareInterface, Flusha
                     '%totalColumnsCount%' => $countHeaders,
                     '%itemColumnsCount%'  => $countData,
                     '%filePath%'          => $filePath,
-                    '%lineno%'            => $this->fileIterator->key()
+                    '%lineno%'            => $this->flatFileIterator->key()
                 ]
             );
         }

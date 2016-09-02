@@ -6,7 +6,7 @@ use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
-class FileIteratorSpec extends ObjectBehavior
+class FlatFileIteratorSpec extends ObjectBehavior
 {
     function let()
     {
@@ -130,25 +130,17 @@ Est'
         $this->valid()->shouldReturn(false);
     }
 
-    function it_indicates_if_current_position_is_header()
-    {
-        $this->rewind();
-        $this->isHeader()->shouldReturn(true);
-        $this->next();
-        $this->isHeader()->shouldReturn(false);
-    }
-
     private function getPath()
     {
         return __DIR__ . DIRECTORY_SEPARATOR . '..' .
-               DIRECTORY_SEPARATOR  . '..' .
-               DIRECTORY_SEPARATOR  . '..'.
-               DIRECTORY_SEPARATOR  . '..'.
-               DIRECTORY_SEPARATOR  . '..'.
-               DIRECTORY_SEPARATOR  . '..' .
-               DIRECTORY_SEPARATOR  . '..' .
-               DIRECTORY_SEPARATOR  . 'features' .
-               DIRECTORY_SEPARATOR  . 'Context' .
-               DIRECTORY_SEPARATOR  . 'fixtures';
+        DIRECTORY_SEPARATOR  . '..' .
+        DIRECTORY_SEPARATOR  . '..'.
+        DIRECTORY_SEPARATOR  . '..'.
+        DIRECTORY_SEPARATOR  . '..'.
+        DIRECTORY_SEPARATOR  . '..' .
+        DIRECTORY_SEPARATOR  . '..' .
+        DIRECTORY_SEPARATOR  . 'features' .
+        DIRECTORY_SEPARATOR  . 'Context' .
+        DIRECTORY_SEPARATOR  . 'fixtures';
     }
 }

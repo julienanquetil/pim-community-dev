@@ -6,7 +6,7 @@ use Akeneo\Component\Batch\Item\FlushableInterface;
 use Akeneo\Component\Batch\Item\ItemReaderInterface;
 use Akeneo\Component\Batch\Step\StepExecutionAwareInterface;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
-use Pim\Component\Connector\Reader\File\FileIteratorFactory;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorFactory;
 use Pim\Component\Connector\Reader\File\MediaPathTransformer;
 
 /**
@@ -25,18 +25,18 @@ class VariantGroupReader extends Reader implements
     protected $mediaPathTransformer;
 
     /**
-     * @param FileIteratorFactory     $fileIteratorFactory
+     * @param FlatFileIteratorFactory $flatFileIteratorFactory
      * @param ArrayConverterInterface $converter
      * @param MediaPathTransformer    $mediaPathTransformer
      * @param array                   $options
      */
     public function __construct(
-        FileIteratorFactory $fileIteratorFactory,
+        FlatFileIteratorFactory $flatFileIteratorFactory,
         ArrayConverterInterface $converter,
         MediaPathTransformer $mediaPathTransformer,
         array $options = []
     ) {
-        parent::__construct($fileIteratorFactory, $converter, $options);
+        parent::__construct($flatFileIteratorFactory, $converter, $options);
 
         $this->mediaPathTransformer = $mediaPathTransformer;
     }
@@ -55,7 +55,7 @@ class VariantGroupReader extends Reader implements
         if (isset($data['values'])) {
             $data['values'] = $this->mediaPathTransformer->transform(
                 $data['values'],
-                $this->fileIterator->getDirectoryPath()
+                $this->flatFileIterator->getDirectoryPath()
             );
         }
 

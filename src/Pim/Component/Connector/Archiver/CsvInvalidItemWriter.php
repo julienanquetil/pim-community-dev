@@ -7,7 +7,7 @@ use Akeneo\Component\Batch\Model\JobExecution;
 use Akeneo\Component\Batch\Model\StepExecution;
 use Pim\Component\Connector\Job\JobParameters\DefaultValuesProvider\ProductCsvExport;
 use Pim\Component\Connector\Job\JobParameters\DefaultValuesProvider\SimpleCsvExport;
-use Pim\Component\Connector\Reader\File\FileIteratorInterface;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorInterface;
 
 /**
  * Writer for invalid items coming from a CSV import.
@@ -28,34 +28,27 @@ class CsvInvalidItemWriter extends AbstractInvalidItemWriter
     }
 
     /**
-     * Get the input file iterator to iterate on all the lines of the file.
-     *
-     * @param JobParameters $jobParameters
-     *
-     * @return FileIteratorInterface
+     * {@inheritdoc}
      */
     protected function getInputFileIterator(JobParameters $jobParameters)
     {
         $filePath = $jobParameters->get('filePath');
         $delimiter = $jobParameters->get('delimiter');
         $enclosure = $jobParameters->get('enclosure');
-        $fileIterator = $this->fileIteratorFactory->create($filePath, [
+        $flatFileIterator = $this->flatFileIteratorFactory->create($filePath, [
             'reader_options' => [
                 'fieldDelimiter' => $delimiter,
                 'fieldEnclosure' => $enclosure,
             ]
         ]);
-        $fileIterator->rewind();
-        $fileIterator->next();
+        $flatFileIterator->rewind();
+        $flatFileIterator->next();
 
-        return $fileIterator;
+        return $flatFileIterator;
     }
 
     /**
-     * Setup the writer with a new JobExecution to write the invalid_items file.
-     * We need to setup the writer manually because it's usally set up by the ItemStep.
-     *
-     * @param JobExecution $jobExecution
+     * {@inheritdoc}
      */
     protected function setupWriter(JobExecution $jobExecution)
     {

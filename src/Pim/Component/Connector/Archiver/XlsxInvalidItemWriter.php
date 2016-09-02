@@ -32,11 +32,11 @@ class XlsxInvalidItemWriter extends AbstractInvalidItemWriter
     protected function getInputFileIterator(JobParameters $jobParameters)
     {
         $filePath = $jobParameters->get('filePath');
-        $fileIterator = $this->fileIteratorFactory->create($filePath);
-        $fileIterator->rewind();
-        $fileIterator->next();
+        $flatFileIterator = $this->flatFileIteratorFactory->create($filePath);
+        $flatFileIterator->rewind();
+        $flatFileIterator->next();
 
-        return $fileIterator;
+        return $flatFileIterator;
     }
 
     /**

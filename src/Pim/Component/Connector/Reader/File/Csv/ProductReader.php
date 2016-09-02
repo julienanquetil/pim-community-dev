@@ -6,7 +6,7 @@ use Akeneo\Component\Batch\Item\FlushableInterface;
 use Akeneo\Component\Batch\Item\ItemReaderInterface;
 use Akeneo\Component\Batch\Step\StepExecutionAwareInterface;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
-use Pim\Component\Connector\Reader\File\FileIteratorFactory;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorFactory;
 use Pim\Component\Connector\Reader\File\MediaPathTransformer;
 
 /**
@@ -28,18 +28,18 @@ class ProductReader extends Reader implements
     protected $mediaPathTransformer;
 
     /**
-     * @param FileIteratorFactory     $fileIteratorFactory
+     * @param FlatFileIteratorFactory $flatFileIteratorFactory
      * @param ArrayConverterInterface $converter
      * @param MediaPathTransformer    $mediaPathTransformer
      * @param array                   $options
      */
     public function __construct(
-        FileIteratorFactory $fileIteratorFactory,
+        FlatFileIteratorFactory $flatFileIteratorFactory,
         ArrayConverterInterface $converter,
         MediaPathTransformer $mediaPathTransformer,
         array $options = []
     ) {
-        parent::__construct($fileIteratorFactory, $converter, $options);
+        parent::__construct($flatFileIteratorFactory, $converter, $options);
 
         $this->mediaPathTransformer = $mediaPathTransformer;
     }
@@ -55,7 +55,7 @@ class ProductReader extends Reader implements
             return $data;
         }
 
-        return $this->mediaPathTransformer->transform($data, $this->fileIterator->getDirectoryPath());
+        return $this->mediaPathTransformer->transform($data, $this->flatFileIterator->getDirectoryPath());
     }
 
     /**

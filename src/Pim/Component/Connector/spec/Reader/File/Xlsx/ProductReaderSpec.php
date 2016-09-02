@@ -6,20 +6,20 @@ use Akeneo\Component\Batch\Job\JobParameters;
 use Akeneo\Component\Batch\Model\StepExecution;
 use PhpSpec\ObjectBehavior;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
-use Pim\Component\Connector\Reader\File\FileIteratorFactory;
-use Pim\Component\Connector\Reader\File\FileIterator;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorFactory;
+use Pim\Component\Connector\Reader\File\FlatFileIterator;
 use Pim\Component\Connector\Reader\File\MediaPathTransformer;
 use Prophecy\Argument;
 
 class ProductReaderSpec extends ObjectBehavior
 {
     function let(
-        FileIteratorFactory $fileIteratorFactory,
+        FlatFileIteratorFactory $flatFileIteratorFactory,
         ArrayConverterInterface $arrayConverter,
         MediaPathTransformer $mediaPathTransformer,
         StepExecution $stepExecution
     ) {
-        $this->beConstructedWith($fileIteratorFactory, $arrayConverter, $mediaPathTransformer);
+        $this->beConstructedWith($flatFileIteratorFactory, $arrayConverter, $mediaPathTransformer);
         $this->setStepExecution($stepExecution);
     }
 
@@ -34,11 +34,11 @@ class ProductReaderSpec extends ObjectBehavior
     }
 
     function it_transforms_media_paths_to_absolute_paths(
-        $fileIteratorFactory,
+        $flatFileIteratorFactory,
         $arrayConverter,
         $mediaPathTransformer,
         $stepExecution,
-        FileIterator $fileIterator,
+        FlatFileIterator $flatFileIterator,
         JobParameters $jobParameters
     ) {
         $filePath = __DIR__ . '/../../../../../../../../features/Context/fixtures/with_media.csv';
@@ -51,7 +51,7 @@ class ProductReaderSpec extends ObjectBehavior
         $jobParameters->get('decimalSeparator')->willReturn('.');
         $jobParameters->get('dateFormat')->willReturn('YYYY-mm-dd');
 
-        $fileIteratorFactory->create($filePath, [])->willReturn($fileIterator);
+        $flatFileIteratorFactory->create($filePath, [])->willReturn($flatFileIterator);
 
         $item = [
             'sku'          => 'SKU-001',
@@ -92,13 +92,12 @@ class ProductReaderSpec extends ObjectBehavior
             'date_format'       => 'YYYY-mm-dd',
         ];
 
-        $fileIterator->getHeaders()->willReturn(['sku', 'name', 'view', 'manual-fr_FR']);
-        $fileIterator->rewind()->shouldBeCalled();
-        $fileIterator->next()->shouldBeCalled();
-        $fileIterator->current()->willReturn($item);
-        $fileIterator->isHeader()->willReturn(false);
-        $fileIterator->valid()->willReturn(true);
-        $fileIterator->getDirectoryPath()->willReturn($filePath);
+        $flatFileIterator->getHeaders()->willReturn(['sku', 'name', 'view', 'manual-fr_FR']);
+        $flatFileIterator->rewind()->shouldBeCalled();
+        $flatFileIterator->next()->shouldBeCalled();
+        $flatFileIterator->current()->willReturn($item);
+        $flatFileIterator->valid()->willReturn(true);
+        $flatFileIterator->getDirectoryPath()->willReturn($filePath);
 
         $stepExecution->incrementSummaryInfo('item_position')->shouldBeCalled();
 

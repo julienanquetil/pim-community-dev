@@ -9,7 +9,7 @@ namespace Pim\Component\Connector\Reader\File;
  * @copyright 2016 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class FileIteratorFactory
+class FlatFileIteratorFactory
 {
     /** @var string */
     protected $className;
@@ -27,7 +27,7 @@ class FileIteratorFactory
      */
     public function __construct($className, $type)
     {
-        $interface = '\Pim\Component\Connector\Reader\File\FileIteratorInterface';
+        $interface = '\Pim\Component\Connector\Reader\File\FlatFileIteratorInterface';
         if (!is_subclass_of($className, $interface)) {
             throw new \InvalidArgumentException(sprintf('%s must implement %s', $className, $interface));
         }
@@ -42,7 +42,7 @@ class FileIteratorFactory
      * @param string $filePath
      * @param array  $options
      *
-     * @return FileIteratorInterface
+     * @return FlatFileIteratorInterface
      */
     public function create($filePath, array $options = [])
     {

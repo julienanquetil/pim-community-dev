@@ -10,8 +10,8 @@ use Akeneo\Component\Batch\Model\JobExecution;
 use Doctrine\Common\Collections\ArrayCollection;
 use League\Flysystem\Filesystem;
 use Pim\Bundle\ConnectorBundle\EventListener\InvalidItemsCollector;
-use Pim\Component\Connector\Reader\File\FileIteratorFactory;
-use Pim\Component\Connector\Reader\File\FileIteratorInterface;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorFactory;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorInterface;
 
 /**
  * Mutualizes code for writers
@@ -34,8 +34,8 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
     /** @var JobExecution */
     protected $jobExecution;
 
-    /** @var FileIteratorFactory */
-    protected $fileIteratorFactory;
+    /** @var FlatFileIteratorFactory */
+    protected $flatFileIteratorFactory;
 
     /** @var DefaultValuesProviderInterface */
     protected $defaultValuesProvider;
@@ -46,7 +46,7 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
     /**
      * @param InvalidItemsCollector          $collector
      * @param ItemWriterInterface            $writer
-     * @param FileIteratorFactory            $fileIteratorFactory
+     * @param FlatFileIteratorFactory        $flatFileIteratorFactory
      * @param Filesystem                     $filesystem
      * @param DefaultValuesProviderInterface $defaultValuesProvider
      * @param string                         $invalidItemFileFormat
@@ -54,14 +54,14 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
     public function __construct(
         InvalidItemsCollector $collector,
         ItemWriterInterface $writer,
-        FileIteratorFactory $fileIteratorFactory,
+        FlatFileIteratorFactory $flatFileIteratorFactory,
         Filesystem $filesystem,
         DefaultValuesProviderInterface $defaultValuesProvider,
         $invalidItemFileFormat
     ) {
         $this->collector = $collector;
         $this->writer = $writer;
-        $this->fileIteratorFactory = $fileIteratorFactory;
+        $this->flatFileIteratorFactory = $flatFileIteratorFactory;
         $this->filesystem = $filesystem;
         $this->defaultValuesProvider = $defaultValuesProvider;
         $this->invalidItemFileFormat = $invalidItemFileFormat;
@@ -93,7 +93,9 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
 
         $this->setupWriter($jobExecution);
 
-        foreach ($fileIterator as $readItem) {
+        while ($fileIterator->valid()) {
+            $readItem = $fileIterator->current();
+
             $currentItemPosition++;
 
             if ($invalidItemPositions->contains($currentItemPosition)) {
@@ -105,6 +107,7 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
                     $itemsToWrite[] = $invalidItem;
                 }
                 $invalidItemPositions->removeElement($currentItemPosition);
+
             }
 
             if (count($itemsToWrite) > 0 && 0 === count($itemsToWrite) % $this->batchSize) {
@@ -115,6 +118,8 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
             if ($invalidItemPositions->isEmpty()) {
                 break;
             }
+
+            $fileIterator->next();
         }
 
         if (count($itemsToWrite) > 0) {
@@ -145,11 +150,12 @@ abstract class AbstractInvalidItemWriter extends AbstractFilesystemArchiver
     abstract protected function setupWriter(JobExecution $jobExecution);
 
     /**
-     * Get the input file iterator to iterate on all the lines of the file.
+     * Get the input file iterator to iterate on all the items of the file.
+     * The returned \Iterator should be position on the first item of the file.
      *
      * @param JobParameters $jobParameters
      *
-     * @return FileIteratorInterface
+     * @return \Iterator
      */
     abstract protected function getInputFileIterator(JobParameters $jobParameters);
 }

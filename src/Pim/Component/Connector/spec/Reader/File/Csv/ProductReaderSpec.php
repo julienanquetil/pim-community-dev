@@ -6,20 +6,20 @@ use Akeneo\Component\Batch\Job\JobParameters;
 use Akeneo\Component\Batch\Model\StepExecution;
 use PhpSpec\ObjectBehavior;
 use Pim\Component\Connector\ArrayConverter\ArrayConverterInterface;
-use Pim\Component\Connector\Reader\File\FileIteratorFactory;
-use Pim\Component\Connector\Reader\File\FileIterator;
+use Pim\Component\Connector\Reader\File\FlatFileIteratorFactory;
+use Pim\Component\Connector\Reader\File\FlatFileIterator;
 use Pim\Component\Connector\Reader\File\MediaPathTransformer;
 use Prophecy\Argument;
 
 class  ProductReaderSpec extends ObjectBehavior
 {
     function let(
-        FileIteratorFactory $fileIteratorFactory,
+        FlatFileIteratorFactory $flatFileIteratorFactory,
         ArrayConverterInterface $converter,
         MediaPathTransformer $mediaPath,
         StepExecution $stepExecution
     ) {
-        $this->beConstructedWith($fileIteratorFactory, $converter, $mediaPath);
+        $this->beConstructedWith($flatFileIteratorFactory, $converter, $mediaPath);
         $this->setStepExecution($stepExecution);
     }
 
@@ -34,10 +34,10 @@ class  ProductReaderSpec extends ObjectBehavior
     }
 
     function it_transforms_media_paths_to_absolute_paths(
-        $fileIteratorFactory,
+        $flatFileIteratorFactory,
         $converter,
         $stepExecution,
-        FileIterator $fileIterator,
+        FlatFileIterator $flatFileIterator,
         JobParameters $jobParameters,
         $mediaPath
     ) {
@@ -59,19 +59,19 @@ class  ProductReaderSpec extends ObjectBehavior
             'manual-fr_FR' => 'fixtures/sku-001.txt',
         ];
 
-        $fileIteratorFactory->create($filePath, [
+        $flatFileIteratorFactory->create($filePath, [
             'reader_options' => [
                 'fieldDelimiter' => ';',
                 'fieldEnclosure' => '"',
             ]
-        ])->willReturn($fileIterator);
+        ])->willReturn($flatFileIterator);
 
-        $fileIterator->getHeaders()->willReturn(['sku', 'name', 'view', 'manual-fr_FR']);
-        $fileIterator->rewind()->shouldBeCalled();
-        $fileIterator->next()->shouldBeCalled();
-        $fileIterator->current()->willReturn($data);
-        $fileIterator->isHeader()->willReturn(false);
-        $fileIterator->valid()->willReturn(true);
+        $flatFileIterator->getHeaders()->willReturn(['sku', 'name', 'view', 'manual-fr_FR']);
+        $flatFileIterator->rewind()->shouldBeCalled();
+        $flatFileIterator->next()->shouldBeCalled();
+        $flatFileIterator->current()->willReturn($data);
+        $flatFileIterator->isHeader()->willReturn(false);
+        $flatFileIterator->valid()->willReturn(true);
 
         $absolutePath = [
             'sku'          => 'SKU-001',
@@ -81,7 +81,7 @@ class  ProductReaderSpec extends ObjectBehavior
         ];
 
         $directoryPath = __DIR__ . '/../../../../../../features/Context/fixtures';
-        $fileIterator->getDirectoryPath()->willReturn($directoryPath);
+        $flatFileIterator->getDirectoryPath()->willReturn($directoryPath);
         $mediaPath->transform($data, $directoryPath)->willReturn($absolutePath);
 
         $stepExecution->incrementSummaryInfo('item_position')->shouldBeCalled();
