@@ -2,10 +2,14 @@
 
 namespace Context;
 
+use Behat\Behat\Context\BehatContext;
 use Behat\Behat\Context\Step;
-use Behat\CommonContexts\WebApiContext as BehatWebApiContext;
 use Behat\Gherkin\Node\TableNode;
+use Buzz\Browser;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+
+require_once 'PHPUnit/Autoload.php';
+require_once 'PHPUnit/Framework/Assert/Functions.php';
 
 /**
  * Provides custom web API methods
@@ -14,17 +18,38 @@ use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
  * @copyright 2013 Akeneo SAS (http://www.akeneo.com)
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-class WebApiContext extends BehatWebApiContext
+class WebApiContext extends BehatContext
 {
+    /** @var array */
+    private $placeHolders = [];
+
+    /** @var Browser */
+    private $browser;
+
+    /** @var string */
+    private $baseUrl;
+
+    /** @var array */
+    private $headers = [];
+
+    /** @var string */
     protected $url;
 
     /**
-     * {@inheritdoc}
+     * @param string  $baseUrl
+     * @param Browser $browser
      */
     public function __construct($baseUrl, Browser $browser = null)
     {
-        parent::__construct($baseUrl, $browser);
         $this->url = rtrim($baseUrl, '/');
+
+        $this->baseUrl = rtrim($baseUrl, '/');
+
+        if (null === $browser) {
+            $this->browser = new Browser();
+        } else {
+            $this->browser = $browser;
+        }
     }
 
     /**
@@ -82,6 +107,30 @@ class WebApiContext extends BehatWebApiContext
     }
 
     /**
+     * Sets place holder for replacement.
+     *
+     * you can specify placeholders, which will
+     * be replaced in URL, request or response body.
+     *
+     * @param string $key   token name
+     * @param string $value replace value
+     */
+    public function setPlaceHolder($key, $value)
+    {
+        $this->placeHolders[$key] = $value;
+    }
+
+    /**
+     * Returns browser instance.
+     *
+     * @return Browser
+     */
+    public function getBrowser()
+    {
+        return $this->browser;
+    }
+
+    /**
      * Adds WSSE authentication header to next request.
      *
      * @param string $username
@@ -116,5 +165,15 @@ class WebApiContext extends BehatWebApiContext
     protected function getFixturesContext()
     {
         return $this->getMainContext()->getSubcontext('fixtures');
+    }
+
+    /**
+     * Adds header
+     *
+     * @param string $header
+     */
+    protected function addHeader($header)
+    {
+        $this->headers[] = $header;
     }
 }
